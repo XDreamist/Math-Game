@@ -1,7 +1,11 @@
 package com.game.math;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class Root extends VBox {
@@ -9,38 +13,31 @@ public class Root extends VBox {
 
     public Root(double spacing) {
         super(spacing);
-
-        setupUI(); // Replace or find good implementation design
+        setupUI();
     }
 
     public void setupUI() {
+        // Title Label
+        Label titleLabel = new Label("Math Graph Plotter");
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Input Field and Submit Button
+        TextField eqnField = new TextField("Enter x expression (e.g., x * x)");
+        eqnField.setPromptText("Enter a mathematical expression");
+        HBox.setHgrow(eqnField, Priority.ALWAYS);
+        Button eqnSubmitBtn = new Button("Plot Custom");
+
+        // Layout for Input and Buttons
+        HBox eqnLayout = new HBox(10, eqnField, eqnSubmitBtn);
+        VBox.setMargin(eqnLayout, new Insets(10));
+
+        // Graph Canvas
         graphCanvas = new GraphCanvas(800, 500);
 
-        Button sinButton = new Button("Sine");
-        Button cosButton = new Button("Cosine");
-        Button tanButton = new Button("Tangent");
-        TextField customField = new TextField("Enter x expression (e.g., x * x)");
-        Button customButton = new Button("Plot Custom");
-
-        // Event handlers
-        sinButton.setOnAction(e -> {
-            graphCanvas.setFunction(Math::sin);
-            graphCanvas.drawGraph();
-        });
-
-        cosButton.setOnAction(e -> {
-            graphCanvas.setFunction(Math::cos);
-            graphCanvas.drawGraph();
-        });
-
-        tanButton.setOnAction(e -> {
-            graphCanvas.setFunction(Math::tan);
-            graphCanvas.drawGraph();
-        });
-
-        customButton.setOnAction(e -> {
+        // Event Handlers
+        eqnSubmitBtn.setOnAction(e -> {
             try {
-                String expression = customField.getText();
+                String expression = eqnField.getText();
                 ExpressionEvaluator evaluator = new ExpressionEvaluator(expression);
                 graphCanvas.setFunction(evaluator::evaluate);
                 graphCanvas.drawGraph();
@@ -49,6 +46,9 @@ public class Root extends VBox {
             }
         });
 
-        this.getChildren().addAll(graphCanvas.getCanvas(), sinButton, cosButton, tanButton, customField, customButton);
+        // Add all components to the VBox
+        this.getChildren().addAll(titleLabel, eqnLayout, graphCanvas.getCanvas());
+        this.setPadding(new Insets(15));
+        this.setSpacing(10);
     }
 }
