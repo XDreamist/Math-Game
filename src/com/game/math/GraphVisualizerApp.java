@@ -5,8 +5,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class GraphVisualizerApp extends Application {
-    private static final int            APP_WIDTH  = 800;
-    private static final int            APP_HEIGHT = 700;
+    private static final int            APP_WIDTH  = 830;
+    private static final int            APP_HEIGHT = 620;
     private static final String         APP_TITLE  = "Graph Visualizer";
 
 

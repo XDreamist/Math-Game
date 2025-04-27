@@ -24,7 +24,7 @@ public class Root extends VBox {
         setupConnections();
     }
 
-    public void setupUI() {
+    private void setupUI() {
         // Title Label
         titleLabel = new Label("Graph Plotter");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -40,16 +40,23 @@ public class Root extends VBox {
         VBox.setMargin(eqnLayout, new Insets(10));
 
         // Graph Canvas
-        graphCanvas = new GraphCanvas(800, 500);
+        graphCanvas = new GraphCanvas(500, 500);
 
         // Add all components to the VBox
         this.getChildren().addAll(titleLabel, eqnLayout, graphCanvas);
         this.setPadding(new Insets(15));
+        this.setAlignment(javafx.geometry.Pos.CENTER);
         this.setSpacing(10);
     }
 
-    public void setupConnections() {
-        eqnSubmitBtn.setOnAction(e -> {
+    private void setupConnections() {
+        // Make the graph canvas responsive
+        // graphCanvas.widthProperty().addListener((obs, oldVal, newVal) -> {
+        //     graphCanvas.setWidth(newVal.doubleValue());
+        //     graphCanvas.updateGraph();
+        // });
+
+        eqnSubmitBtn.setOnAction(event -> {
             try {
                 expression = eqnField.getText();
                 expressionEvaluator = new ExpressionEvaluator(expression);
