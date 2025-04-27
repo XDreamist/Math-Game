@@ -6,67 +6,82 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class GraphCanvas {
-    private final Canvas canvas;
+public class GraphCanvas extends Canvas {
+    private GraphicsContext          graphicsContext;
+    private double                   graphXTotal;
+    private double                   graphYTotal;
+    private double                   graphXCenter;
+    private double                   graphYCenter;
+    private int                      graphXGrid = 5;
+    private int                      graphYGrid = 5;
+    private double                   graphXDividend;
+    private double                   graphYDividend;
     private Function<Double, Double> currentFunction;
-    private final double width;
-    private final double height;
 
     public GraphCanvas(double width, double height) {
-        this.width = width;
-        this.height = height;
-        this.canvas = new Canvas(width, height);
-        this.currentFunction = Math::sin;
+        super(width, height);
 
+        updateParams();
         drawGraph();
     }
 
-    public void setFunction(Function<Double, Double> function) {
-        this.currentFunction = function;
+    private void updateParams() {
+        graphicsContext = this.getGraphicsContext2D();
+        graphXTotal = this.getWidth();
+        graphYTotal = this.getHeight();
+        graphXCenter = graphXTotal / 2;
+        graphYCenter = graphYTotal / 2;
+        graphXDividend = graphXCenter / graphXGrid;
+        graphYDividend = graphYCenter / graphYGrid;
     }
 
     public void drawGraph() {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        
         // Clear canvas
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, width, height);
+        graphicsContext.setFill(Color.WHITE);
+        graphicsContext.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         // Draw axes
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1);
-        double xCenter = width / 2;
-        double yCenter = height / 2;
-        gc.strokeLine(xCenter, 0, xCenter, height); // Y-axis
-        gc.strokeLine(0, yCenter, width, yCenter);   // X-axis
+        graphicsContext.setStroke(Color.BLACK);
+        graphicsContext.setLineWidth(1);
+        graphicsContext.strokeLine(graphXCenter, 0, graphXCenter, this.getHeight()); // Y-axis
+        graphicsContext.strokeLine(0, graphYCenter, this.getWidth(), graphYCenter); // X-axis
+
+        // Draw grids
+        graphicsContext.setStroke(Color.GREY);
+        graphicsContext.setLineWidth(0.5);
+
+        for (int lineNo = 0; lineNo < graphXGrid; lineNo++) {
+            graphicsContext.strokeLine(graphXCenter + (graphXDividend * lineNo), 0, graphXCenter + (graphXDividend * lineNo), this.getHeight());
+        }
+    }
+
+    public void drawFunction(Function<Double, Double> function) {
+        this.currentFunction = function;
 
         // Draw function
-        gc.setStroke(Color.BLUE);
-        gc.setLineWidth(2);
-        
-        double scaleX = 50;  // Pixels per unit
-        double scaleY = 50;  // Pixels per unit
-        
-        double prevX = -xCenter / scaleX;
+        graphicsContext.setStroke(Color.BLUE);
+        graphicsContext.setLineWidth(2);
+
+        double scaleX = 50; // Pixels per unit
+        double scaleY = 50; // Pixels per unit
+
+        double prevX = -graphXCenter / scaleX;
         double prevY = currentFunction.apply(prevX);
-        
-        for (double x = -xCenter / scaleX; x <= xCenter / scaleX; x += 0.1) {
+
+        for (double x = -graphXCenter / scaleX; x <= graphXCenter / scaleX; x += 0.1) {
             double y = currentFunction.apply(x);
             // Check for discontinuities
-            if (Math.abs(y) > 100) continue;
-            
-            gc.strokeLine(
-                xCenter + prevX * scaleX,
-                yCenter - prevY * scaleY,
-                xCenter + x * scaleX,
-                yCenter - y * scaleY
+            if (Math.abs(y) > 100)
+                continue;
+
+            graphicsContext.strokeLine(
+                graphXCenter + prevX * scaleX,
+                graphYCenter - prevY * scaleY,
+                graphXCenter + x * scaleX,
+                graphYCenter - y * scaleY
             );
             prevX = x;
             prevY = y;
         }
-    }
-
-    public Canvas getCanvas() {
-        return canvas;
     }
 }
