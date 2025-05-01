@@ -10,13 +10,11 @@ import javafx.scene.layout.VBox;
 
 public class Root extends VBox {
     private Label                     titleLabel;
-    private Button                    eqnSubmitBtn;
-    private TextField                 eqnField;
-    private HBox                      eqnLayout;
+    private Button                    exprSubmitBtn;
+    private TextField                 exprField;
+    private HBox                      exprLayout;
 
     private GraphCanvas               graphCanvas;
-    private String                    expression;
-    private ExpressionEvaluator       expressionEvaluator;
 
     public Root() {
         super();
@@ -30,20 +28,20 @@ public class Root extends VBox {
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         // Input Field and Submit Button
-        eqnField = new TextField("Enter x expression (e.g., x * x)");
-        eqnField.setPromptText("Enter a mathematical expression");
-        HBox.setHgrow(eqnField, Priority.ALWAYS);
-        eqnSubmitBtn = new Button("Plot");
+        exprField = new TextField("Enter x expression (e.g., x * x)");
+        exprField.setPromptText("Enter a mathematical expression");
+        HBox.setHgrow(exprField, Priority.ALWAYS);
+        exprSubmitBtn = new Button("Plot");
 
         // Layout for Input and Buttons
-        eqnLayout = new HBox(10, eqnField, eqnSubmitBtn);
-        VBox.setMargin(eqnLayout, new Insets(10));
+        exprLayout = new HBox(10, exprField, exprSubmitBtn);
+        VBox.setMargin(exprLayout, new Insets(10));
 
         // Graph Canvas
         graphCanvas = new GraphCanvas(500, 500);
 
         // Add all components to the VBox
-        this.getChildren().addAll(titleLabel, eqnLayout, graphCanvas);
+        this.getChildren().addAll(titleLabel, exprLayout, graphCanvas);
         this.setPadding(new Insets(15));
         this.setAlignment(javafx.geometry.Pos.CENTER);
         this.setSpacing(10);
@@ -56,11 +54,17 @@ public class Root extends VBox {
         //     graphCanvas.updateGraph();
         // });
 
-        eqnSubmitBtn.setOnAction(event -> {
+        exprField.setOnAction(event -> {
             try {
-                expression = eqnField.getText();
-                expressionEvaluator = new ExpressionEvaluator(expression);
-                graphCanvas.drawFunction(expressionEvaluator::evaluate);
+                graphCanvas.drawFunction(exprField.getText());
+            } catch (Exception exception) {
+                System.out.println("Invalid expression: " + exception.getMessage());
+            }
+        });
+
+        exprSubmitBtn.setOnAction(event -> {
+            try {
+                graphCanvas.drawFunction(exprField.getText());
             } catch (Exception exception) {
                 System.out.println("Invalid expression: " + exception.getMessage());
             }

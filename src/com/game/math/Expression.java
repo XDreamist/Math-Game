@@ -1,14 +1,36 @@
 package com.game.math;
 
-public class ExpressionEvaluator {
-    private final String expression;
+public class Expression {
+    private final String   rawExpression;
+    private String       exprParts;
+    private final String[] operators = {"+", "-", "*", "/", "^", "sin", "cos", "tan"};
+    // private final String[] extractedExpression;
+    private char           variable;
 
-    public ExpressionEvaluator(String expression) {
-        this.expression = expression.toLowerCase();
+    public Expression(String textString) {
+        rawExpression = textString;
+        exprParts = rawExpression.toLowerCase().replaceAll(" ", "");
+        exprParts = extractExpression(textString);
+        System.out.println(exprParts);
+    }
+    
+    private String extractExpression(String expression) {
+        int exprLength = exprParts.length();
+
+        if (exprParts.charAt(1) == '=') {
+            variable = exprParts.charAt(0);
+            return exprParts.substring(2);
+        }
+        else if (exprParts.charAt(exprLength - 2) == '=') {
+            variable = exprParts.charAt(exprLength - 1);
+            return exprParts.substring(0, exprLength - 2);
+        }
+        else variable = 'y';
+        return exprParts;
     }
 
     public double evaluate(double x) {
-        String evalExpression = expression.replace("x", String.valueOf(x));
+        String evalExpression = rawExpression.replace("x", String.valueOf(x));
 
         if (evalExpression.contains("*")) {
             String[] parts = evalExpression.split("\\*");

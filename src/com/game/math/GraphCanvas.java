@@ -18,6 +18,9 @@ public class GraphCanvas extends Canvas {
     private final int                graphYGrid = 20;
     private double                   graphXDividend;
     private double                   graphYDividend;
+
+    private Expression               expressionEvaluator;
+    private String                   currentExpression;
     private Function<Double, Double> currentFunction;
 
     public GraphCanvas(double width, double height) {
@@ -63,11 +66,13 @@ public class GraphCanvas extends Canvas {
         }
     }
 
-    public void drawFunction(Function<Double, Double> function) {
-        if (function == null) return;
+    public void drawFunction(String expression) {
+        if (expression == null) return;
         
         drawGraph();
-        this.currentFunction = function;
+        currentExpression = expression;
+        expressionEvaluator = new Expression(expression);
+        currentFunction = expressionEvaluator::evaluate;
 
         // Draw function
         graphicsContext.setStroke(Color.BLUE);
@@ -98,7 +103,7 @@ public class GraphCanvas extends Canvas {
 
     public void updateGraph() {
         updateParams();
-        if (currentFunction != null) drawFunction(currentFunction);
+        if (currentExpression != null) drawFunction(currentExpression);
         else drawGraph();
     }
 }
