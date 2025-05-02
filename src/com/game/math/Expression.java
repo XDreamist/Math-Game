@@ -1,36 +1,43 @@
 package com.game.math;
 
 public class Expression {
-    private final String   rawExpression;
-    private String       exprParts;
+    private final String   rawExpr;
+    private String         mainVar;
+    private String         mainExpr;
     private final String[] operators = {"+", "-", "*", "/", "^", "sin", "cos", "tan"};
     // private final String[] extractedExpression;
-    private char           variable;
 
-    public Expression(String textString) {
-        rawExpression = textString;
-        exprParts = rawExpression.toLowerCase().replaceAll(" ", "");
-        exprParts = extractExpression(textString);
-        System.out.println(exprParts);
+    public Expression(String exprString) {
+        this.rawExpr = exprString;
+        String[] extractedExpr = extractExpression(rawExpr);
+        mainVar = extractedExpr[0];
+        mainExpr = extractedExpr[1];
+        System.out.println("Eqn of " + mainVar + " is: " + mainExpr);
     }
     
-    private String extractExpression(String expression) {
-        int exprLength = exprParts.length();
+    private String[] extractExpression(String expression) {
+        String exprToExtract = expression.toLowerCase().replaceAll(" ", "");
+        int exprLength = exprToExtract.length();
+        String[] extractedParts = new String[2];
 
-        if (exprParts.charAt(1) == '=') {
-            variable = exprParts.charAt(0);
-            return exprParts.substring(2);
+        if (exprToExtract.charAt(1) == '=') {
+            extractedParts[0] = exprToExtract.substring(0, 1);
+            extractedParts[1] = exprToExtract.substring(2);
         }
-        else if (exprParts.charAt(exprLength - 2) == '=') {
-            variable = exprParts.charAt(exprLength - 1);
-            return exprParts.substring(0, exprLength - 2);
+        else if (exprToExtract.charAt(exprLength - 2) == '=') {
+            extractedParts[0] = exprToExtract.substring(exprLength - 1);
+            extractedParts[1] = exprToExtract.substring(0, exprLength - 2);
         }
-        else variable = 'y';
-        return exprParts;
+        else {
+            extractedParts[0] = "y";
+            extractedParts[1] = exprToExtract;
+        }
+
+        return extractedParts;
     }
 
-    public double evaluate(double x) {
-        String evalExpression = rawExpression.replace("x", String.valueOf(x));
+    public double evaluate(double variable) {
+        String evalExpression = mainExpr.replace("y".equals(mainVar) ? "x" : "y", String.valueOf(variable));
 
         if (evalExpression.contains("*")) {
             String[] parts = evalExpression.split("\\*");
