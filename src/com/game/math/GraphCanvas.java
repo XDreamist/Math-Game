@@ -19,8 +19,9 @@ public class GraphCanvas extends Canvas {
     private double                   graphXDividend;
     private double                   graphYDividend;
 
-    private Expression               expressionEvaluator;
+    private Evaluator                expressionEvaluator;
     private String                   currentExpression;
+    private boolean                  isYMainVar;
     private Function<Double, Double> currentFunction;
 
     public GraphCanvas(double width, double height) {
@@ -71,7 +72,8 @@ public class GraphCanvas extends Canvas {
         
         drawGraph();
         currentExpression = expression;
-        expressionEvaluator = new Expression(expression);
+        expressionEvaluator = new Evaluator(expression);
+        isYMainVar = expressionEvaluator.mainVar.equals("y");
         currentFunction = expressionEvaluator::evaluate;
 
         // Draw function
@@ -81,23 +83,26 @@ public class GraphCanvas extends Canvas {
         double scaleX = 50; // Pixels per unit
         double scaleY = 50; // Pixels per unit
 
-        double prevX = -graphXCenter / scaleX;
-        double prevY = currentFunction.apply(prevX);
+        double prevValVar = -graphXCenter / scaleX;
+        double prevMainVar = currentFunction.apply(prevValVar);
 
-        for (double x = -graphXCenter / scaleX; x <= graphXCenter / scaleX; x += 0.1) {
-            double y = currentFunction.apply(x);
+        double prevX = isYMainVar ? prevValVar : prevMainVar;
+        double prevY = isYMainVar ? prevMainVar : prevValVar;
+
+        for (double valAxis = -graphXCenter / scaleX; valAxis <= graphXCenter / scaleX; valAxis += 0.1) {
+            double baseAxis = currentFunction.apply(valAxis);
             // Check for discontinuities
-            if (Math.abs(y) > 100)
+            if (Math.abs(baseAxis) > 100)
                 continue;
 
             graphicsContext.strokeLine(
                 graphXCenter + prevX * scaleX,
                 graphYCenter - prevY * scaleY,
-                graphXCenter + x * scaleX,
-                graphYCenter - y * scaleY
+                graphXCenter + (isYMainVar ? valAxis : baseAxis) * scaleX,
+                graphYCenter - (isYMainVar ? baseAxis : valAxis) * scaleY
             );
-            prevX = x;
-            prevY = y;
+            prevX = (isYMainVar ? valAxis : baseAxis);
+            prevY = (isYMainVar ? baseAxis : valAxis);
         }
     }
 

@@ -1,69 +1,32 @@
 package com.game.math;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Expression {
-    private final String   rawExpr;
-    private String         mainVar;
-    private String         mainExpr;
-    private final String[] operators = {"+", "-", "*", "/", "^", "sin", "cos", "tan"};
-    // private final String[] extractedExpression;
+    private final String mainExpression;
+    private List<Expression> subExpressions = new ArrayList<>();
+    private List<String>     operations = new ArrayList<>();
 
-    public Expression(String exprString) {
-        this.rawExpr = exprString;
-        String[] extractedExpr = extractExpression(rawExpr);
-        mainVar = extractedExpr[0];
-        mainExpr = extractedExpr[1];
-        System.out.println("Eqn of " + mainVar + " is: " + mainExpr);
-    }
-    
-    private String[] extractExpression(String expression) {
-        String exprToExtract = expression.toLowerCase().replaceAll(" ", "");
-        int exprLength = exprToExtract.length();
-        String[] extractedParts = new String[2];
+    public Expression(String expressionString) {
+        mainExpression = expressionString;
 
-        if (exprToExtract.charAt(1) == '=') {
-            extractedParts[0] = exprToExtract.substring(0, 1);
-            extractedParts[1] = exprToExtract.substring(2);
-        }
-        else if (exprToExtract.charAt(exprLength - 2) == '=') {
-            extractedParts[0] = exprToExtract.substring(exprLength - 1);
-            extractedParts[1] = exprToExtract.substring(0, exprLength - 2);
-        }
-        else {
-            extractedParts[0] = "y";
-            extractedParts[1] = exprToExtract;
-        }
-
-        return extractedParts;
+        seperateExpressions(mainExpression);
     }
 
-    public double evaluate(double variable) {
-        String evalExpression = mainExpr.replace("y".equals(mainVar) ? "x" : "y", String.valueOf(variable));
+    private void seperateExpressions(String expression) {
+        // Before moving onto +,-,sin,cos,tan,*,/ we need to do (,),[,],{,}, etc..
 
-        if (evalExpression.contains("*")) {
-            String[] parts = evalExpression.split("\\*");
-            return Double.parseDouble(parts[0].trim()) * Double.parseDouble(parts[1].trim());
-        } else if (evalExpression.contains("+")) {
-            String[] parts = evalExpression.split("\\+");
-            return Double.parseDouble(parts[0].trim()) + Double.parseDouble(parts[1].trim());
-        } else if (evalExpression.contains("-")) {
-            String[] parts = evalExpression.split("-");
-            return Double.parseDouble(parts[0].trim()) - Double.parseDouble(parts[1].trim());
-        } else if (evalExpression.contains("/")) {
-            String[] parts = evalExpression.split("/");
-            return Double.parseDouble(parts[0].trim()) / Double.parseDouble(parts[1].trim());
-        } else if (evalExpression.contains("^")) {
-            String[] parts = evalExpression.split("\\^");
-            return Math.pow(Double.parseDouble(parts[0].trim()), Double.parseDouble(parts[1].trim()));
-        } else if (evalExpression.contains("sin")) {
-            String angle = evalExpression.replace("sin", "").trim();
-            return Math.sin(Math.toRadians(Double.parseDouble(angle)));
-        } else if (evalExpression.contains("cos")) {
-            String angle = evalExpression.replace("cos", "").trim();
-            return Math.cos(Math.toRadians(Double.parseDouble(angle)));
-        } else if (evalExpression.contains("tan")) {
-            String angle = evalExpression.replace("tan", "").trim();
-            return Math.tan(Math.toRadians(Double.parseDouble(angle)));
+        String[] exprParts;
+        if (expression.contains("+")) {
+            exprParts = expression.split("\\+");
+            System.out.print("Addition: ");
+            for (String exprPart : exprParts) {
+                subExpressions.addLast(new Expression(exprPart));
+                System.out.print(exprPart + ", ");
+            }
+            System.out.println();
+            operations.addLast("+");
         }
-        return Double.parseDouble(evalExpression);
     }
 }
