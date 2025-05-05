@@ -28,5 +28,9 @@ public class Expression {
             System.out.println();
             operations.addLast("+");
         }
+        else if (expression.contains("-")) {
+            exprParts = expression.split("\\-");
+            
+        }
     }
 }
